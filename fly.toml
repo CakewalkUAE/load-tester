@@ -4,7 +4,7 @@
 #
 
 app = "load-tester"
-primary_region = "sin"  # Singapore region, you can change this
+primary_region = "bom"  # Singapore region, you can change this
 
 [build]
   dockerfile = "Dockerfile"
@@ -36,12 +36,13 @@ primary_region = "sin"  # Singapore region, you can change this
   method = "GET"
   path = "/api/health"
   protocol = "http"
+  port = 8080
   tls_skip_verify = true
 
 [[vm]]
   cpu_kind = "performance"
   cpus = 1
-  memory_mb = 2048
+  memory_mb = 2048  # Increased to meet minimum requirement
 
 [deploy]
   strategy = "immediate"
