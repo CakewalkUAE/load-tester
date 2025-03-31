@@ -34,6 +34,8 @@ COPY package.json pnpm-lock.yaml ./
 # Install production dependencies only
 RUN pnpm install --prod
 
+RUN npm install -g autocannon
+
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 
