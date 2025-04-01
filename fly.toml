@@ -27,6 +27,7 @@ primary_region = "bom"  # Singapore region, you can change this
   [http_service.concurrency]
     type = "requests"
     soft_limit = 30000
+    hard_limit = 30000
 
 [[http_service.checks]]
   interval = "15s"
