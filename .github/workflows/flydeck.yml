@@ -1,0 +1,19 @@
+name: Build for FlyDeck
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Build & push image
+        run: |
+          flyctl auth docker
+          docker build -t registry.fly.io/flydeck:sha-${{ github.sha }} .
+          docker push registry.fly.io/flydeck:sha-${{ github.sha }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
