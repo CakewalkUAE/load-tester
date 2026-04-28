@@ -3,17 +3,37 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      dockerfile:
+        description: 'Path to Dockerfile (leave blank to auto-detect)'
+        default: ''
+      context:
+        description: 'Docker build context directory'
+        default: '.'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      IMAGE: registry.fly.io/flydeck:sha-${{ github.sha }}
+      CONTEXT: ${{ inputs.context || '.' }}
+      DOCKERFILE: ${{ inputs.dockerfile || 'Dockerfile' }}
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
+
       - name: Build & push image
         run: |
           flyctl auth docker
-          docker build -t registry.fly.io/flydeck:sha-${{ github.sha }} .
-          docker push registry.fly.io/flydeck:sha-${{ github.sha }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+          if [ -f "$DOCKERFILE" ]; then
+            echo "Building with Dockerfile: $DOCKERFILE"
+            docker build -f "$DOCKERFILE" -t "$IMAGE" "$CONTEXT"
+            docker push "$IMAGE"
+          else
+            echo "No Dockerfile found — using Nixpacks (auto-detects your stack)"
+            curl -sSL https://nixpacks.com/install.sh | bash
+            nixpacks build "$CONTEXT" --name "flydeck" --tag "$IMAGE"
+            docker push "$IMAGE"
+          fi
