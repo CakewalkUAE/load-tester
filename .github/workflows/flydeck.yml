@@ -10,6 +10,9 @@ on:
       context:
         description: 'Docker build context directory'
         default: '.'
+      port:
+        description: 'Port your app listens on'
+        default: '8080'
 
 jobs:
   build:
@@ -19,6 +22,7 @@ jobs:
       IMAGE: registry.fly.io/flydeck:sha-${{ github.sha }}
       CONTEXT: ${{ inputs.context || '.' }}
       DOCKERFILE: ${{ inputs.dockerfile || 'Dockerfile' }}
+      PORT: ${{ inputs.port || '8080' }}
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
